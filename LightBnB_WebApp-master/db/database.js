@@ -20,16 +20,33 @@ pool.query(`SELECT title FROM properties LIMIT 10;`).then(response => {});
  * @param {String} email The email of the user.
  * @return {Promise<{}>} A promise to the user.
  */
+
 const getUserWithEmail = function (email) {
-  let resolvedUser = null;
-  for (const userId in users) {
-    const user = users[userId];
-    if (user && user.email.toLowerCase() === email.toLowerCase()) {
-      resolvedUser = user;
-    }
-  }
-  return Promise.resolve(resolvedUser);
+  // SQL query to find the user by email
+  const queryString = `
+    SELECT * 
+    FROM users 
+    WHERE email = $1;
+  `;
+
+  // Parameters for the SQL query
+  const queryParams = [email.toLowerCase()]; // Ensure the email is in lowercase to match the database
+
+  // Return a promise that resolves with the user or null
+  return pool
+    .query(queryString, queryParams)
+    .then(res => {
+      if (res.rows.length > 0) {
+        return res.rows[0]; // User found
+      } else {
+        return null; // No user found
+      }
+    })
+    .catch(err => {
+      console.error('Query Error:', err);
+    });
 };
+
 
 /**
  * Get a single user from the database given their id.
@@ -37,7 +54,24 @@ const getUserWithEmail = function (email) {
  * @return {Promise<{}>} A promise to the user.
  */
 const getUserWithId = function (id) {
-  return Promise.resolve(users[id]);
+  const queryString = `
+  SELECT *
+  FROM users
+  WHERE id = $1;
+  `;
+
+  return pool
+    .query(queryString, [id])
+    .then(res => {
+      if (res.rows.length > 0) {
+        return res.rows[0];
+      } else {
+        return null;
+      }
+    })
+    .catch(err => {
+      console.log('Query Error:', err);
+    });
 };
 
 /**
@@ -45,12 +79,27 @@ const getUserWithId = function (id) {
  * @param {{name: string, password: string, email: string}} user
  * @return {Promise<{}>} A promise to the user.
  */
+
 const addUser = function (user) {
-  const userId = Object.keys(users).length + 1;
-  user.id = userId;
-  users[userId] = user;
-  return Promise.resolve(user);
+  const queryString = `
+    INSERT INTO users (name, email, password) 
+    VALUES ($1, $2, $3)
+    RETURNING *;
+  `;
+
+  // Replace these with the actual field names and values from the user object
+  const queryParams = [user.name, user.email, user.password];
+
+  return pool
+    .query(queryString, queryParams)
+    .then(res => {
+      return res.rows[0]; // Return the newly created user
+    })
+    .catch(err => {
+      console.log('Query Error:', err);
+    });
 };
+
 
 /// Reservations
 
@@ -82,7 +131,6 @@ const getAllProperties = (options, limit = 10) => {
       console.log(err.message);
     });
 };
-
 
 /**
  * Add a property to the database

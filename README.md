@@ -27,3 +27,6 @@ This is a simplified and clone of AirBnB called LightBnB. This project was creat
 - Cookie-session
 - Nodemon
 - pg
+
+## Screenshots
+![Listings]("https://github.com/ricomortus/LightBnB/blob/main/docs/Listings.png")

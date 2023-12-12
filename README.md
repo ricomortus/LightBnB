@@ -29,4 +29,4 @@ This is a simplified and clone of AirBnB called LightBnB. This project was creat
 - pg
 
 ## Screenshots
-![Listings]("https://github.com/ricomortus/LightBnB/blob/main/docs/Listings.png")
+![Listings](https://github.com/ricomortus/LightBnB/blob/main/docs/Listings.png)
